@@ -25,7 +25,7 @@ public final class PayToKeep extends JavaPlugin {
     private static Permission perms = null;
     private static Chat chat = null;
     private static Map<String, List<Boolean>> data;
-    private static int price;
+    private static double price;
 
     @Override
     public void onEnable() {
@@ -94,7 +94,19 @@ public final class PayToKeep extends JavaPlugin {
         }
 
         // /setinvprice
-        if (command.getName().equalsIgnoreCase("setinvprice")) {}
+        if (command.getName().equalsIgnoreCase("setinvprice")) {
+            if (args.length == 0) {
+                sender.sendMessage("请输入一个价格！");
+                return false;
+            }
+            try {
+                price = Double.parseDouble(args[0]);
+                saveJsonData("./PayToKeepData/data.json", data, price);
+                sender.sendMessage("价格已设置为" + price);
+            } catch (NumberFormatException e) {
+                sender.sendMessage("请输入一个数字！");
+            }
+        }
 
         // /switchkeep
         if (command.getName().equalsIgnoreCase("switchkeep")) {}
@@ -136,7 +148,7 @@ public final class PayToKeep extends JavaPlugin {
         // Check if file is empty, if so initialize data with an empty map
         if (Files.size(path) == 0) {
             data = new HashMap<>();
-            price = 1000;
+            price = 1000.0;
         } else {
             // Read the file and convert its content to a Map<String, boolean[]>
             data = loadedJson.get("data") == null ? new HashMap<>() : (Map<String, List<Boolean>>) loadedJson.get("data");
@@ -144,7 +156,7 @@ public final class PayToKeep extends JavaPlugin {
         }
     }
 
-    private void saveJsonData(String filePath, Map<String, List<Boolean>> data, int price) {
+    private void saveJsonData(String filePath, Map<String, List<Boolean>> data, double price) {
         ObjectMapper objectMapper = new ObjectMapper();
         Path path = Paths.get(filePath);
         Map<String, Object> dataToWrite = new HashMap<>();

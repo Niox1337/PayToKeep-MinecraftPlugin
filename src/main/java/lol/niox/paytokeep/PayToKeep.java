@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -97,19 +98,34 @@ public final class PayToKeep extends JavaPlugin {
         if (command.getName().equalsIgnoreCase("setinvprice")) {
             if (args.length == 0) {
                 sender.sendMessage("请输入一个价格！");
-                return false;
             }
             try {
                 price = Double.parseDouble(args[0]);
                 saveJsonData("./PayToKeepData/data.json", data, price);
                 sender.sendMessage("价格已设置为" + price);
+                return true;
             } catch (NumberFormatException e) {
                 sender.sendMessage("请输入一个数字！");
             }
         }
 
         // /switchkeep
-        if (command.getName().equalsIgnoreCase("switchkeep")) {}
+        if (command.getName().equalsIgnoreCase("switchkeep")) {
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                String playerUUID = player.getUniqueId().toString();
+                if (data.containsKey(playerUUID)) {
+                    data.get(playerUUID).set(1, !data.get(playerUUID).get(1));
+                    player.sendMessage("你的保留状态已切换为" + ChatColor.GOLD + (data.get(playerUUID).get(1) ? " 开启" : " 关闭"));
+                    saveJsonData("./PayToKeepData/data.json", data, price);
+                } else {
+                    List<Boolean> booleanList = Arrays.asList(false, false);
+                    data.put(playerUUID, booleanList);
+                    player.sendMessage("你的保留状态已切换为" + ChatColor.GOLD + " 关闭");
+                }
+                return true;
+            }
+        }
 
         // /salvage
         if (command.getName().equalsIgnoreCase("salvage")) {}

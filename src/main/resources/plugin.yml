@@ -6,3 +6,6 @@ commands:
   buyinv:
     description: 购买保留物品
     usage: /<command>
+  setinvprice:
+    description: 设置保留物品价格
+    usage: /<command> <price>

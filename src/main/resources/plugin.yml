@@ -1,0 +1,4 @@
+name: PayToKeep
+version: '${project.version}'
+main: lol.niox.paytokeep.PayToKeep
+api-version: '1.20'

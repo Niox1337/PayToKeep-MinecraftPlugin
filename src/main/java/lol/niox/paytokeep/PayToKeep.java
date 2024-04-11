@@ -26,7 +26,7 @@ public final class PayToKeep extends JavaPlugin {
     public static Map<String, List<Boolean>> data;
     private static double price;
     private static double salvagePrice;
-    private static long salvageExpirationTime;
+    private static int salvageExpirationTime;
 
     @Override
     public void onEnable() {
@@ -186,7 +186,7 @@ public final class PayToKeep extends JavaPlugin {
                 sender.sendMessage("请输入一个时间！");
             }
             try {
-                salvageExpirationTime = Long.parseLong(args[0]);
+                salvageExpirationTime = Integer.parseInt(args[0]);
                 saveJsonData("./PayToKeepData/data.json");
                 sender.sendMessage("时间已设置为" + ChatColor.GOLD + salvageExpirationTime + "毫秒");
                 return true;
@@ -237,7 +237,7 @@ public final class PayToKeep extends JavaPlugin {
             data = loadedJson.get("data") == null ? new HashMap<>() : (Map<String, List<Boolean>>) loadedJson.get("data");
             price = (double) loadedJson.get("price");
             salvagePrice = (double) loadedJson.get("salvagePrice");
-            salvageExpirationTime = (long) loadedJson.get("salvageExpirationTime");
+            salvageExpirationTime = (int) loadedJson.get("salvageExpirationTime");
         }
     }
 

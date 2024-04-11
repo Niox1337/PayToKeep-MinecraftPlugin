@@ -1,15 +1,15 @@
 package lol.niox.paytokeep;
 
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static lol.niox.paytokeep.PayToKeep.saveJsonData;
 
@@ -29,7 +29,7 @@ public class PlayerDeathListener implements Listener {
             }
         }
         event.getEntity().sendMessage(String.format("库存丢失，你有%s秒时间来购买库存恢复", PayToKeep.getSalvageExpirationTime() / 1000));
-        deathRecords.put(event.getEntity().getUniqueId(), new DeathInfo(System.currentTimeMillis(), event.getDrops(), event.getEntity().getExp()));
+        deathRecords.put(event.getEntity().getUniqueId(), new DeathInfo(System.currentTimeMillis(), event.getDrops(), event.getEntity().getExp(), event.getEntity().getLocation()));
     }
 
     @EventHandler
@@ -54,8 +54,13 @@ public class PlayerDeathListener implements Listener {
                 player.sendMessage("你的库存已过期");
                 return;
             }
+            List<Entity> entities = Objects.requireNonNull(deathInfo.location.getWorld())
+                    .getNearbyEntities(deathInfo.location, 2, 2, 2)
+                    .stream()
+                    .filter(entity -> entity instanceof Item)
+                    .collect(Collectors.toList());
+            entities.forEach(Entity::remove);
             deathInfo.drops.forEach(player.getInventory()::addItem);
-            deathInfo.drops.clear();
             player.setExp(deathInfo.exp);
             deathRecords.remove(playerUUID);
             player.sendMessage("库存已回收");

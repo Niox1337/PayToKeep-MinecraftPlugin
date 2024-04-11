@@ -99,16 +99,17 @@ public final class PayToKeep extends JavaPlugin {
 
         // /setkpprice
         if (command.getName().equalsIgnoreCase("kpsetprice")) {
-            if (args.length == 0) {
+            if (args.length > 0) {
+                try {
+                    price = Double.parseDouble(args[0]);
+                    saveJsonData("./PayToKeepData/data.json");
+                    sender.sendMessage("价格已设置为" + ChatColor.GREEN + price);
+                    return true;
+                } catch (NumberFormatException e) {
+                    sender.sendMessage("请输入一个数字！");
+                }
+            } else {
                 sender.sendMessage("请输入一个价格！");
-            }
-            try {
-                price = Double.parseDouble(args[0]);
-                saveJsonData("./PayToKeepData/data.json");
-                sender.sendMessage("价格已设置为" + ChatColor.GREEN + price);
-                return true;
-            } catch (NumberFormatException e) {
-                sender.sendMessage("请输入一个数字！");
             }
         }
 
@@ -167,31 +168,33 @@ public final class PayToKeep extends JavaPlugin {
 
         // /setsalvageprice
         if (command.getName().equalsIgnoreCase("salvagesetprice")) {
-            if (args.length == 0) {
+            if (args.length > 0) {
+                try {
+                    salvagePrice = Double.parseDouble(args[0]);
+                    saveJsonData("./PayToKeepData/data.json");
+                    sender.sendMessage("价格已设置为" + ChatColor.GREEN + salvagePrice);
+                    return true;
+                } catch (NumberFormatException e) {
+                    sender.sendMessage("请输入一个数字！");
+                }
+            } else {
                 sender.sendMessage("请输入一个价格！");
-            }
-            try {
-                salvagePrice = Double.parseDouble(args[0]);
-                saveJsonData("./PayToKeepData/data.json");
-                sender.sendMessage("价格已设置为" + ChatColor.GREEN + salvagePrice);
-                return true;
-            } catch (NumberFormatException e) {
-                sender.sendMessage("请输入一个数字！");
             }
         }
 
         // /setexpire
         if (command.getName().equalsIgnoreCase("salvagesetexpire")) {
-            if (args.length == 0) {
+            if (args.length > 0) {
+                try {
+                    salvageExpirationTime = Integer.parseInt(args[0]);
+                    saveJsonData("./PayToKeepData/data.json");
+                    sender.sendMessage("时间已设置为" + ChatColor.GOLD + salvageExpirationTime + ChatColor.RESET + "毫秒");
+                    return true;
+                } catch (NumberFormatException e) {
+                    sender.sendMessage("请输入一个数字！");
+                }
+            } else {
                 sender.sendMessage("请输入一个时间！");
-            }
-            try {
-                salvageExpirationTime = Integer.parseInt(args[0]);
-                saveJsonData("./PayToKeepData/data.json");
-                sender.sendMessage("时间已设置为" + ChatColor.GOLD + salvageExpirationTime + "毫秒");
-                return true;
-            } catch (NumberFormatException e) {
-                sender.sendMessage("请输入一个数字！");
             }
         }
         return false;

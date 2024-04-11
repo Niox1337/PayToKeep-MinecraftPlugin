@@ -3,24 +3,24 @@ version: '${project.version}'
 main: lol.niox.paytokeep.PayToKeep
 api-version: '1.20'
 commands:
-  buykp:
+  kpbuy:
     description: 购买保留物品
     usage: /<command>
-  setkpprice:
+  kpsetprice:
     description: 设置保留物品价格
     usage: /<command> <price>
-  switchkp:
+  kpswitch:
     description: 开关保留物品
+    usage: /<command>
+  kpstatus:
+    description: 查看保留物品状态
     usage: /<command>
   salvage:
     description: 恢复物品
     usage: /<command>
-  setsalvageprice:
+  salvagesetprice:
     description: 设置恢复物品价格
     usage: /<command> <price>
-  setexpire:
+  salvagesetexpire:
     description: 设置恢复物品过期时间
     usage: /<command> <time>
-  kpstatus:
-    description: 查看保留物品状态
-    usage: /<command>

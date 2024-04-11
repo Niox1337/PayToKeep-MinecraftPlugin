@@ -69,7 +69,7 @@ public final class PayToKeep extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         // /buykp
-        if (command.getName().equalsIgnoreCase("buykp")) {
+        if (command.getName().equalsIgnoreCase("kpbuy")) {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 String playerUUID = player.getUniqueId().toString();
@@ -98,7 +98,7 @@ public final class PayToKeep extends JavaPlugin {
         }
 
         // /setkpprice
-        if (command.getName().equalsIgnoreCase("setkpprice")) {
+        if (command.getName().equalsIgnoreCase("kpsetprice")) {
             if (args.length == 0) {
                 sender.sendMessage("请输入一个价格！");
             }
@@ -113,7 +113,7 @@ public final class PayToKeep extends JavaPlugin {
         }
 
         // /switchkp
-        if (command.getName().equalsIgnoreCase("switchkp")) {
+        if (command.getName().equalsIgnoreCase("kpswitch")) {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 String playerUUID = player.getUniqueId().toString();
@@ -128,36 +128,6 @@ public final class PayToKeep extends JavaPlugin {
                     saveJsonData("./PayToKeepData/data.json");
                 }
                 return true;
-            }
-        }
-
-        // /salvage
-        if (command.getName().equalsIgnoreCase("salvage")) {
-            if (sender instanceof Player) {
-                Player player = (Player) sender;
-                if (econ.getBalance(player) < salvagePrice) {
-                    player.sendMessage("穷鬼，钱够了再来！");
-                    return true;
-                } else {
-                    econ.withdrawPlayer(player, salvagePrice);
-                }
-                Salvage(player, System.currentTimeMillis());
-                return true;
-            }
-        }
-
-        // /setsalvageprice
-        if (command.getName().equalsIgnoreCase("setsalvageprice")) {
-            if (args.length == 0) {
-                sender.sendMessage("请输入一个价格！");
-            }
-            try {
-                salvagePrice = Double.parseDouble(args[0]);
-                saveJsonData("./PayToKeepData/data.json");
-                sender.sendMessage("价格已设置为" + ChatColor.GREEN + salvagePrice);
-                return true;
-            } catch (NumberFormatException e) {
-                sender.sendMessage("请输入一个数字！");
             }
         }
 
@@ -180,8 +150,38 @@ public final class PayToKeep extends JavaPlugin {
             }
         }
 
+        // /salvage
+        if (command.getName().equalsIgnoreCase("salvage")) {
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                if (econ.getBalance(player) < salvagePrice) {
+                    player.sendMessage("穷鬼，钱够了再来！");
+                    return true;
+                } else {
+                    econ.withdrawPlayer(player, salvagePrice);
+                }
+                Salvage(player, System.currentTimeMillis());
+                return true;
+            }
+        }
+
+        // /setsalvageprice
+        if (command.getName().equalsIgnoreCase("salvagesetprice")) {
+            if (args.length == 0) {
+                sender.sendMessage("请输入一个价格！");
+            }
+            try {
+                salvagePrice = Double.parseDouble(args[0]);
+                saveJsonData("./PayToKeepData/data.json");
+                sender.sendMessage("价格已设置为" + ChatColor.GREEN + salvagePrice);
+                return true;
+            } catch (NumberFormatException e) {
+                sender.sendMessage("请输入一个数字！");
+            }
+        }
+
         // /setexpire
-        if (command.getName().equalsIgnoreCase("setexpire")) {
+        if (command.getName().equalsIgnoreCase("salvagesetexpire")) {
             if (args.length == 0) {
                 sender.sendMessage("请输入一个时间！");
             }

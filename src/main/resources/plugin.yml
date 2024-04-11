@@ -3,15 +3,21 @@ version: '${project.version}'
 main: lol.niox.paytokeep.PayToKeep
 api-version: '1.20'
 commands:
-  buyinv:
+  buykp:
     description: 购买保留物品
     usage: /<command>
-  setinvprice:
+  setkpprice:
     description: 设置保留物品价格
     usage: /<command> <price>
-  switchkeep:
+  switchkp:
     description: 开关保留物品
     usage: /<command>
   salvage:
     description: 恢复物品
     usage: /<command>
+  setsalvageprice:
+    description: 设置恢复物品价格
+    usage: /<command> <price>
+  setexpire:
+    description: 设置恢复物品过期时间
+    usage: /<command> <time>

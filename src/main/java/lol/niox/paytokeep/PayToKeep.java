@@ -68,8 +68,8 @@ public final class PayToKeep extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        // /buyinv
-        if (command.getName().equalsIgnoreCase("buyinv")) {
+        // /buykp
+        if (command.getName().equalsIgnoreCase("buykp")) {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 String playerUUID = player.getUniqueId().toString();
@@ -97,8 +97,8 @@ public final class PayToKeep extends JavaPlugin {
             }
         }
 
-        // /setinvprice
-        if (command.getName().equalsIgnoreCase("setinvprice")) {
+        // /setkpprice
+        if (command.getName().equalsIgnoreCase("setkpprice")) {
             if (args.length == 0) {
                 sender.sendMessage("请输入一个价格！");
             }
@@ -112,8 +112,8 @@ public final class PayToKeep extends JavaPlugin {
             }
         }
 
-        // /switchkeep
-        if (command.getName().equalsIgnoreCase("switchkeep")) {
+        // /switchkp
+        if (command.getName().equalsIgnoreCase("switchkp")) {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 String playerUUID = player.getUniqueId().toString();
@@ -161,8 +161,27 @@ public final class PayToKeep extends JavaPlugin {
             }
         }
 
-        // /setsalvageexpirationtime
-        if (command.getName().equalsIgnoreCase("setsalvageexpirationtime")) {
+        // /kpstatus
+        if (command.getName().equalsIgnoreCase("kpstatus")) {
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                String playerUUID = player.getUniqueId().toString();
+                if (data.containsKey(playerUUID)) {
+                    player.sendMessage("你的库存状态为：" + ChatColor.GOLD + (data.get(playerUUID).get(0) ? "已购买" : "未购买") + ChatColor.RESET + "，" +
+                            "保留状态为：" + ChatColor.GOLD + (data.get(playerUUID).get(1) ? "开启" : "关闭"));
+                } else {
+                    List<Boolean> booleanList = Arrays.asList(false, false);
+                    data.put(playerUUID, booleanList);
+                    saveJsonData("./PayToKeepData/data.json");
+                    player.sendMessage("你的库存状态为：" + ChatColor.GOLD + "未购买" + ChatColor.RESET + "，" +
+                            "保留状态为：" + ChatColor.GOLD + "关闭");
+                }
+                return true;
+            }
+        }
+
+        // /setexpire
+        if (command.getName().equalsIgnoreCase("setexpire")) {
             if (args.length == 0) {
                 sender.sendMessage("请输入一个时间！");
             }

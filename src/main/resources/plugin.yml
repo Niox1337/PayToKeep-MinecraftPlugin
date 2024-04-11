@@ -21,3 +21,6 @@ commands:
   setexpire:
     description: 设置恢复物品过期时间
     usage: /<command> <time>
+  kpstatus:
+    description: 查看保留物品状态
+    usage: /<command>

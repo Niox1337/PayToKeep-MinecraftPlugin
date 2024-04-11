@@ -25,12 +25,11 @@ public final class PayToKeep extends JavaPlugin {
     private static Economy econ = null;
     private static Permission perms = null;
     private static Chat chat = null;
-    private static Map<String, List<Boolean>> data;
+    public static Map<String, List<Boolean>> data;
     private static double price;
 
     @Override
     public void onEnable() {
-        System.out.println("PayToKeep has been enabled!");
         System.out.println("autumnal—leaves是大笨蛋！");
         if (!setupEconomy() ) {
             getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
@@ -56,6 +55,9 @@ public final class PayToKeep extends JavaPlugin {
             throw new RuntimeException(e);
         }
 
+        getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);
+
+        System.out.println("PayToKeep has been enabled!");
     }
 
     @Override
@@ -157,9 +159,7 @@ public final class PayToKeep extends JavaPlugin {
     }
 
     private void loadJsonData(String filePath) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
         Path path = Paths.get(filePath);
-        Map<String, Object> loadedJson = ((Map<String, Object>) objectMapper.readValue(path.toFile(), Map.class));
 
         // Check if file is empty, if so initialize data with an empty map
         if (Files.size(path) == 0) {
@@ -167,6 +167,8 @@ public final class PayToKeep extends JavaPlugin {
             price = 1000.0;
         } else {
             // Read the file and convert its content to a Map<String, boolean[]>
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> loadedJson = ((Map<String, Object>) objectMapper.readValue(path.toFile(), Map.class));
             data = loadedJson.get("data") == null ? new HashMap<>() : (Map<String, List<Boolean>>) loadedJson.get("data");
             price = (int) loadedJson.get("price");
         }
@@ -185,6 +187,10 @@ public final class PayToKeep extends JavaPlugin {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static Map<String, List<Boolean>> getData() {
+        return data;
     }
 
 }

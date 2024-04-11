@@ -1,6 +1,5 @@
 package lol.niox.paytokeep;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
@@ -16,10 +15,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static lol.niox.paytokeep.PlayerDeathListener.Salvage;
 
 public final class PayToKeep extends JavaPlugin {
     private static Economy econ = null;
@@ -27,6 +25,8 @@ public final class PayToKeep extends JavaPlugin {
     private static Chat chat = null;
     public static Map<String, List<Boolean>> data;
     private static double price;
+    private static double salvagePrice;
+    private static long salvageExpirationTime;
 
     @Override
     public void onEnable() {
@@ -81,6 +81,7 @@ public final class PayToKeep extends JavaPlugin {
                 } else {
                     List<Boolean> booleanList = Arrays.asList(false, true);
                     data.put(playerUUID, booleanList);
+                    saveJsonData("./PayToKeepData/data.json");
                 }
                 if (econ.getBalance(player) < price) {
                     player.sendMessage("穷鬼，钱够了再来！");
@@ -89,7 +90,7 @@ public final class PayToKeep extends JavaPlugin {
                     econ.withdrawPlayer(player, price);
                     data.get(playerUUID).set(0, true);
                     player.sendMessage("你现在可以随便死一次了！");
-                    saveJsonData("./PayToKeepData/data.json", data, price);
+                    saveJsonData("./PayToKeepData/data.json");
                     return true;
                 }
 
@@ -103,8 +104,8 @@ public final class PayToKeep extends JavaPlugin {
             }
             try {
                 price = Double.parseDouble(args[0]);
-                saveJsonData("./PayToKeepData/data.json", data, price);
-                sender.sendMessage("价格已设置为" + price);
+                saveJsonData("./PayToKeepData/data.json");
+                sender.sendMessage("价格已设置为" + ChatColor.GREEN + price);
                 return true;
             } catch (NumberFormatException e) {
                 sender.sendMessage("请输入一个数字！");
@@ -119,18 +120,61 @@ public final class PayToKeep extends JavaPlugin {
                 if (data.containsKey(playerUUID)) {
                     data.get(playerUUID).set(1, !data.get(playerUUID).get(1));
                     player.sendMessage("你的保留状态已切换为" + ChatColor.GOLD + (data.get(playerUUID).get(1) ? " 开启" : " 关闭"));
-                    saveJsonData("./PayToKeepData/data.json", data, price);
+                    saveJsonData("./PayToKeepData/data.json");
                 } else {
                     List<Boolean> booleanList = Arrays.asList(false, false);
                     data.put(playerUUID, booleanList);
                     player.sendMessage("你的保留状态已切换为" + ChatColor.GOLD + " 关闭");
+                    saveJsonData("./PayToKeepData/data.json");
                 }
                 return true;
             }
         }
 
         // /salvage
-        if (command.getName().equalsIgnoreCase("salvage")) {}
+        if (command.getName().equalsIgnoreCase("salvage")) {
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                if (econ.getBalance(player) < salvagePrice) {
+                    player.sendMessage("穷鬼，钱够了再来！");
+                    return true;
+                } else {
+                    econ.withdrawPlayer(player, salvagePrice);
+                }
+                Salvage(player, System.currentTimeMillis());
+                return true;
+            }
+        }
+
+        // /setsalvageprice
+        if (command.getName().equalsIgnoreCase("setsalvageprice")) {
+            if (args.length == 0) {
+                sender.sendMessage("请输入一个价格！");
+            }
+            try {
+                salvagePrice = Double.parseDouble(args[0]);
+                saveJsonData("./PayToKeepData/data.json");
+                sender.sendMessage("价格已设置为" + ChatColor.GREEN + salvagePrice);
+                return true;
+            } catch (NumberFormatException e) {
+                sender.sendMessage("请输入一个数字！");
+            }
+        }
+
+        // /setsalvageexpirationtime
+        if (command.getName().equalsIgnoreCase("setsalvageexpirationtime")) {
+            if (args.length == 0) {
+                sender.sendMessage("请输入一个时间！");
+            }
+            try {
+                salvageExpirationTime = Long.parseLong(args[0]);
+                saveJsonData("./PayToKeepData/data.json");
+                sender.sendMessage("时间已设置为" + ChatColor.GOLD + salvageExpirationTime + "毫秒");
+                return true;
+            } catch (NumberFormatException e) {
+                sender.sendMessage("请输入一个数字！");
+            }
+        }
         return false;
     }
 
@@ -165,21 +209,27 @@ public final class PayToKeep extends JavaPlugin {
         if (Files.size(path) == 0) {
             data = new HashMap<>();
             price = 1000.0;
+            salvagePrice = 1500.0;
+            salvageExpirationTime = 30000;
         } else {
             // Read the file and convert its content to a Map<String, boolean[]>
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> loadedJson = ((Map<String, Object>) objectMapper.readValue(path.toFile(), Map.class));
             data = loadedJson.get("data") == null ? new HashMap<>() : (Map<String, List<Boolean>>) loadedJson.get("data");
-            price = (int) loadedJson.get("price");
+            price = (double) loadedJson.get("price");
+            salvagePrice = (double) loadedJson.get("salvagePrice");
+            salvageExpirationTime = (long) loadedJson.get("salvageExpirationTime");
         }
     }
 
-    private void saveJsonData(String filePath, Map<String, List<Boolean>> data, double price) {
+    public static void saveJsonData(String filePath) {
         ObjectMapper objectMapper = new ObjectMapper();
         Path path = Paths.get(filePath);
         Map<String, Object> dataToWrite = new HashMap<>();
         dataToWrite.put("data", data);
         dataToWrite.put("price", price);
+        dataToWrite.put("salvagePrice", salvagePrice);
+        dataToWrite.put("salvageExpirationTime", salvageExpirationTime);
 
         // Write the data to the file
         try {
@@ -191,6 +241,10 @@ public final class PayToKeep extends JavaPlugin {
 
     public static Map<String, List<Boolean>> getData() {
         return data;
+    }
+
+    public static double getSalvageExpirationTime() {
+        return salvageExpirationTime;
     }
 
 }

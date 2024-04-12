@@ -1,5 +1,6 @@
 package lol.niox.paytokeep;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -12,6 +13,7 @@ import org.bukkit.inventory.PlayerInventory;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static lol.niox.paytokeep.PayToKeep.FILE_PATH;
 import static lol.niox.paytokeep.PayToKeep.saveJsonData;
 
 public class PlayerDeathListener implements Listener {
@@ -48,8 +50,9 @@ public class PlayerDeathListener implements Listener {
         if (data.containsKey(playerID)) {
             if (data.get(playerID).get(0) && data.get(playerID).get(1)) {
                 data.get(playerID).set(0, false);
-                event.getPlayer().sendMessage("库存已恢复");
-                saveJsonData("./PayToKeepData/data.json");
+                event.getPlayer().sendMessage(ChatColor.AQUA + "库存已恢复");
+                event.getPlayer().sendMessage(ChatColor.DARK_RED + "购买已重置");
+                saveJsonData(FILE_PATH);
             }
         }
     }
@@ -61,11 +64,11 @@ public class PlayerDeathListener implements Listener {
             PlayerInventory playerInventory = player.getInventory();
             if (currentTime - deathInfo.lastDeath > PayToKeep.getSalvageExpirationTime()){
                 deathRecords.remove(player.getUniqueId());
-                player.sendMessage("你的库存已过期");
+                player.sendMessage(ChatColor.RED + "你的库存已过期");
                 return;
             }
             List<Entity> entities = Objects.requireNonNull(deathInfo.location.getWorld())
-                    .getNearbyEntities(deathInfo.location, 5, 100, 5)
+                    .getNearbyEntities(deathInfo.location, 5, 50, 5)
                     .stream()
                     .filter(entity -> entity instanceof Item)
                     .collect(Collectors.toList());
@@ -75,9 +78,9 @@ public class PlayerDeathListener implements Listener {
             playerInventory.setArmorContents(deathInfo.equipment);
             playerInventory.setItemInOffHand(deathInfo.offHand);
             deathRecords.remove(playerUUID);
-            player.sendMessage("库存已回收");
+            player.sendMessage(ChatColor.GREEN + "库存已回收");
         } else {
-            player.sendMessage("没有可回收的库存");
+            player.sendMessage(ChatColor.RED + "没有可回收的库存");
         }
     }
 }

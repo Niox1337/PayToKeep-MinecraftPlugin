@@ -27,6 +27,7 @@ public final class PayToKeep extends JavaPlugin {
     private static double price;
     private static double salvagePrice;
     private static int salvageExpirationTime;
+    public static final String FILE_PATH = "./plugins/PayToKeepData/data.json";
 
     @Override
     public void onEnable() {
@@ -39,7 +40,7 @@ public final class PayToKeep extends JavaPlugin {
         setupPermissions();
         setupChat();
 
-        Path filePath = Paths.get("./PayToKeepData/data.json");
+        Path filePath = Paths.get(FILE_PATH);
 
         if (!Files.exists(filePath)) {
             try {
@@ -81,7 +82,7 @@ public final class PayToKeep extends JavaPlugin {
                 } else {
                     List<Boolean> booleanList = Arrays.asList(false, true);
                     data.put(playerUUID, booleanList);
-                    saveJsonData("./PayToKeepData/data.json");
+                    saveJsonData(FILE_PATH);
                 }
                 if (econ.getBalance(player) < price) {
                     player.sendMessage("穷鬼，钱够了再来！");
@@ -90,7 +91,7 @@ public final class PayToKeep extends JavaPlugin {
                     econ.withdrawPlayer(player, price);
                     data.get(playerUUID).set(0, true);
                     player.sendMessage("你现在可以随便死一次了！");
-                    saveJsonData("./PayToKeepData/data.json");
+                    saveJsonData(FILE_PATH);
                     return true;
                 }
 
@@ -102,7 +103,7 @@ public final class PayToKeep extends JavaPlugin {
             if (args.length > 0) {
                 try {
                     price = Double.parseDouble(args[0]);
-                    saveJsonData("./PayToKeepData/data.json");
+                    saveJsonData(FILE_PATH);
                     sender.sendMessage("价格已设置为" + ChatColor.GREEN + price);
                     return true;
                 } catch (NumberFormatException e) {
@@ -121,12 +122,12 @@ public final class PayToKeep extends JavaPlugin {
                 if (data.containsKey(playerUUID)) {
                     data.get(playerUUID).set(1, !data.get(playerUUID).get(1));
                     player.sendMessage("你的保留状态已切换为" + ChatColor.GOLD + (data.get(playerUUID).get(1) ? " 开启" : " 关闭"));
-                    saveJsonData("./PayToKeepData/data.json");
+                    saveJsonData(FILE_PATH);
                 } else {
                     List<Boolean> booleanList = Arrays.asList(false, false);
                     data.put(playerUUID, booleanList);
                     player.sendMessage("你的保留状态已切换为" + ChatColor.GOLD + " 关闭");
-                    saveJsonData("./PayToKeepData/data.json");
+                    saveJsonData(FILE_PATH);
                 }
                 return true;
             }
@@ -143,7 +144,7 @@ public final class PayToKeep extends JavaPlugin {
                 } else {
                     List<Boolean> booleanList = Arrays.asList(false, false);
                     data.put(playerUUID, booleanList);
-                    saveJsonData("./PayToKeepData/data.json");
+                    saveJsonData(FILE_PATH);
                     player.sendMessage("你的库存状态为：" + ChatColor.GOLD + "未购买" + ChatColor.RESET + "，" +
                             "保留状态为：" + ChatColor.GOLD + "关闭");
                 }
@@ -171,7 +172,7 @@ public final class PayToKeep extends JavaPlugin {
             if (args.length > 0) {
                 try {
                     salvagePrice = Double.parseDouble(args[0]);
-                    saveJsonData("./PayToKeepData/data.json");
+                    saveJsonData(FILE_PATH);
                     sender.sendMessage("价格已设置为" + ChatColor.GREEN + salvagePrice);
                     return true;
                 } catch (NumberFormatException e) {
@@ -187,7 +188,7 @@ public final class PayToKeep extends JavaPlugin {
             if (args.length > 0) {
                 try {
                     salvageExpirationTime = Integer.parseInt(args[0]);
-                    saveJsonData("./PayToKeepData/data.json");
+                    saveJsonData(FILE_PATH);
                     sender.sendMessage("时间已设置为" + ChatColor.GOLD + salvageExpirationTime + ChatColor.RESET + "毫秒");
                     return true;
                 } catch (NumberFormatException e) {

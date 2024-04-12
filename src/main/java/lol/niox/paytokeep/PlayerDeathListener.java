@@ -118,11 +118,17 @@ public class PlayerDeathListener implements Listener {
     public void onPickupItem(EntityPickupItemEvent event) {
         Item item = event.getItem();
         Entity entity = event.getEntity();
-        for (DeathInfo deathInfo : deathRecords.values()) {
+        Iterator<Map.Entry<UUID, DeathInfo>> iterator = deathRecords.entrySet().iterator();
+        for (Map.Entry<UUID, DeathInfo> entry : deathRecords.entrySet()) {
+            DeathInfo deathInfo = entry.getValue();
             if (deathInfo.droppedItems.contains(item)) {
                 event.setCancelled(true);
                 if (entity instanceof Player) {
                     Player player = (Player) entity;
+                    if (player.getUniqueId().equals(entry.getKey())){
+                        event.setCancelled(false);
+                        return;
+                    }
                     player.sendMessage(ChatColor.RED + "你不能拾取这个物品");
                 }
             }

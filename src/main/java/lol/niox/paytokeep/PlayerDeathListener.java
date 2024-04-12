@@ -35,8 +35,9 @@ public class PlayerDeathListener implements Listener {
         event.getEntity().sendMessage(String.format("库存丢失，你有%s秒时间来购买库存恢复", PayToKeep.getSalvageExpirationTime() / 1000));
         deathRecords.put(event.getEntity().getUniqueId(),
                 new DeathInfo(System.currentTimeMillis(),
-                        event.getDrops(),
+                        player.getInventory().getContents(),
                         player.getExp(),
+                        player.getLevel(),
                         player.getLocation(),
                         player.getInventory().getArmorContents(),
                         player.getInventory().getItemInOffHand()
@@ -73,7 +74,8 @@ public class PlayerDeathListener implements Listener {
                     .filter(entity -> entity instanceof Item)
                     .collect(Collectors.toList());
             entities.forEach(Entity::remove);
-            deathInfo.drops.forEach(playerInventory::addItem);
+            playerInventory.setContents(deathInfo.drops);
+            player.setLevel(deathInfo.level);
             player.setExp(deathInfo.exp);
             playerInventory.setArmorContents(deathInfo.equipment);
             playerInventory.setItemInOffHand(deathInfo.offHand);

@@ -7,16 +7,18 @@ import java.util.List;
 
 public class DeathInfo {
     public long lastDeath;
-    public List<ItemStack> drops;
+    public ItemStack[] drops;
     public float exp;
+    public int level;
     public Location location;
     public ItemStack[] equipment;
     public ItemStack offHand;
 
-    public DeathInfo(long lastDeath, List<ItemStack> drops, float exp, Location location, ItemStack[] equipment, ItemStack offHand) {
+    public DeathInfo(long lastDeath, ItemStack[] drops, float exp, int level, Location location, ItemStack[] equipment, ItemStack offHand) {
         this.lastDeath = lastDeath;
         this.drops = drops;
         this.exp = exp;
+        this.level = level;
         this.location = location;
         this.equipment = equipment;
         this.offHand = offHand;

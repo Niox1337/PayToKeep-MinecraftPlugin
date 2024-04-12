@@ -23,7 +23,7 @@ public final class PayToKeep extends JavaPlugin {
     private static Economy econ = null;
     private static Permission perms = null;
     private static Chat chat = null;
-    public static Map<String, List<Boolean>> data;
+    public static Map<String, List<Boolean>> data;  // <playerUUID, [hasBought, setToKeep]>
     private static double price;
     private static double salvagePrice;
     private static int salvageExpirationTime;

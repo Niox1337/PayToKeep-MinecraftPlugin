@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static lol.niox.paytokeep.PlayerDeathListener.Salvage;
+import static lol.niox.paytokeep.PlayerDeathListener.salvagePart;
 
 public final class PayToKeep extends JavaPlugin {
     private static Economy econ = null;
@@ -196,6 +197,21 @@ public final class PayToKeep extends JavaPlugin {
                 }
             } else {
                 sender.sendMessage("请输入一个时间！");
+            }
+        }
+
+        // /salvagepart
+        if (command.getName().equalsIgnoreCase("salvagepart")) {
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                if (econ.getBalance(player) < salvagePrice) {
+                    player.sendMessage("穷鬼，钱够了再来！");
+                    return true;
+                } else {
+                    econ.withdrawPlayer(player, salvagePrice);
+                }
+                salvagePart(player, System.currentTimeMillis());
+                return true;
             }
         }
         return false;

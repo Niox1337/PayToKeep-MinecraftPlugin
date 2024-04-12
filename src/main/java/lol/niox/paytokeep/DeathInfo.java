@@ -16,6 +16,7 @@ public class DeathInfo {
     public Location location;
     public List<ItemStack> realDrops;
     public List<Item> droppedItems = new ArrayList<>();
+    public List<Item> lostItems = new ArrayList<>();
 
     public DeathInfo(long lastDeath, ItemStack[] drops, float exp, int level, Location location, List<ItemStack> realDrops) {
         this.lastDeath = lastDeath;
@@ -36,5 +37,17 @@ public class DeathInfo {
         for (ItemStack item : realDrops) {
             droppedItems.add(Objects.requireNonNull(location.getWorld()).dropItemNaturally(location, item));
         }
+    }
+
+    public void addLostItem(Item item) {
+        lostItems.add(item);
+    }
+
+    public void removeDroppedItem(Item item) {
+        droppedItems.remove(item);
+    }
+
+    public boolean droppedItemContains(Item item) {
+        return droppedItems.contains(item);
     }
 }

@@ -24,3 +24,6 @@ commands:
   salvagesetexpire:
     description: 设置恢复物品过期时间
     usage: /<command> <time>
+  salvagepart:
+    description: 部分恢复物品
+    usage: /<command>

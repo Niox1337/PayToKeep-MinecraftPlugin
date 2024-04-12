@@ -28,41 +28,48 @@ public class PlayerDeathListener implements Listener {
                 player.sendMessage(ChatColor.RED + "你的库存已过期");
                 return;
             }
-//            List<Entity> entities = new ArrayList<>(Objects.requireNonNull(deathInfo.location.getWorld())
-//                    .getNearbyEntities(deathInfo.location, 5, 50, 5));
-//            List<Material> playerDroppedItems = new ArrayList<>();
-//            List<Material> deathInfoDropTypes = Arrays.stream(deathInfo.drops)
-//                    .filter(Objects::nonNull)
-//                    .map(ItemStack::getType)
-//                    .collect(Collectors.toList());
-//            for (Entity entity : entities) {
-//                if (entity instanceof Item) {
-//                    Material itemType = ((Item) entity).getItemStack().getType();
-//                    if (deathInfoDropTypes.contains(itemType)) {
-//                        playerDroppedItems.add(itemType);
-//                    }
-//                }
-//            }
-//            if (new HashSet<>(playerDroppedItems).containsAll(deathInfoDropTypes)) {
-//                for (Entity entity : entities) {
-//                    if (entity instanceof Item) {
-//                        Material itemType = ((Item) entity).getItemStack().getType();
-//                        if (deathInfoDropTypes.contains(itemType)) {
-//                            entity.remove();
-//                        }
-//                    }
-//                }
-
+            if (!deathInfo.droppedItems.isEmpty()){
+                player.sendMessage(ChatColor.RED + "可恢复库存为空！");
+                return;
+            }
+            if (!deathInfo.lostItems.isEmpty()) {
+                player.sendMessage(ChatColor.RED + "库存不完整，以下物品已丢失:");
+                for (Item item : deathInfo.lostItems) {
+                    player.sendMessage(Objects.requireNonNull(item.getItemStack().getItemMeta()).getDisplayName() +
+                            " x" + item.getItemStack().getAmount());
+                }
+                player.sendMessage(ChatColor.RED + "输入/salvagepart来恢复剩余物品");
+                return;
+            }
             playerInventory.setContents(deathInfo.drops);
             deathInfo.clearDrops();
             player.setExp(deathInfo.exp);
             player.setLevel(deathInfo.level);
             player.sendMessage(ChatColor.AQUA + "库存已恢复");
             deathRecords.remove(playerUUID);
-//            } else {
-//                player.sendMessage(ChatColor.RED + "库存不完整");
-//            }
-//            deathRecords.remove(playerUUID);
+        } else {
+            player.sendMessage(ChatColor.RED + "没有可回收的库存");
+        }
+    }
+
+    public static void salvagePart(Player player, long currentTime) {
+        UUID playerUUID = player.getUniqueId();
+        if (deathRecords.containsKey(playerUUID)) {
+            DeathInfo deathInfo = deathRecords.get(playerUUID);
+            PlayerInventory playerInventory = player.getInventory();
+            if (currentTime - deathInfo.lastDeath > PayToKeep.getSalvageExpirationTime()) {
+                deathRecords.remove(player.getUniqueId());
+                player.sendMessage(ChatColor.RED + "你的库存已过期");
+                return;
+            }
+            for (Item item : deathInfo.droppedItems){
+                playerInventory.addItem(item.getItemStack());
+            }
+            deathInfo.clearDrops();
+            player.setExp(deathInfo.exp);
+            player.setLevel(deathInfo.level);
+            player.sendMessage(ChatColor.AQUA + "部分库存已恢复");
+            deathRecords.remove(playerUUID);
         } else {
             player.sendMessage(ChatColor.RED + "没有可回收的库存");
         }
@@ -118,8 +125,9 @@ public class PlayerDeathListener implements Listener {
         Entity entity = event.getEntity();
         for (Map.Entry<UUID, DeathInfo> entry : deathRecords.entrySet()) {
             DeathInfo deathInfo = entry.getValue();
-            if (deathInfo.droppedItems.contains(item)) {
-                deathInfo.droppedItems.remove(item);
+            if (deathInfo.droppedItemContains(item)) {
+                deathInfo.removeDroppedItem(item);
+                deathInfo.addLostItem(item);
                 return;
             }
         }

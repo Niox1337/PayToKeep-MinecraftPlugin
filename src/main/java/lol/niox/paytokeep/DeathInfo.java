@@ -17,6 +17,7 @@ public class DeathInfo {
     public List<ItemStack> realDrops;
     public List<Item> droppedItems = new ArrayList<>();
     public List<Item> lostItems = new ArrayList<>();
+    public boolean attemptedSalvage = false;
 
     public DeathInfo(long lastDeath, ItemStack[] drops, float exp, int level, Location location, List<ItemStack> realDrops) {
         this.lastDeath = lastDeath;

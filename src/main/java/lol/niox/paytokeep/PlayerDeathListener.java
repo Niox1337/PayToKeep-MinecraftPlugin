@@ -39,6 +39,7 @@ public class PlayerDeathListener implements Listener {
                             " x" + item.getItemStack().getAmount());
                 }
                 player.sendMessage(ChatColor.RED + "输入/salvagepart来恢复剩余物品");
+                deathInfo.attemptedSalvage = true;
                 return;
             }
             playerInventory.setContents(deathInfo.drops);
@@ -56,6 +57,10 @@ public class PlayerDeathListener implements Listener {
         UUID playerUUID = player.getUniqueId();
         if (deathRecords.containsKey(playerUUID)) {
             DeathInfo deathInfo = deathRecords.get(playerUUID);
+            if (!deathInfo.attemptedSalvage) {
+                player.sendMessage(ChatColor.RED + "不能直接恢复部分库存，请先输入/salvage来尝试恢复全部库存");
+                return;
+            }
             PlayerInventory playerInventory = player.getInventory();
             if (currentTime - deathInfo.lastDeath > PayToKeep.getSalvageExpirationTime()) {
                 deathRecords.remove(player.getUniqueId());

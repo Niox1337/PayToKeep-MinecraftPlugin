@@ -1,10 +1,9 @@
 package lol.niox.paytokeep;
 
 import org.bukkit.ChatColor;
-import org.bukkit.block.Hopper;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -117,27 +116,14 @@ public class PlayerDeathListener implements Listener {
 
     @EventHandler
     public void onPickupItem(EntityPickupItemEvent event) {
-        if (event.getEntity() instanceof Player) {
-            Item item = event.getItem();
-            Player player = (Player) event.getEntity();
-            for (DeathInfo deathInfo : deathRecords.values()) {
-                if (deathInfo.droppedItems.contains(item)) {
-                    event.setCancelled(true);
+        Item item = event.getItem();
+        Entity entity = event.getEntity();
+        for (DeathInfo deathInfo : deathRecords.values()) {
+            if (deathInfo.droppedItems.contains(item)) {
+                event.setCancelled(true);
+                if (entity instanceof Player) {
+                    Player player = (Player) entity;
                     player.sendMessage(ChatColor.RED + "你不能拾取这个物品");
-                    return;
-                }
-            }
-        }
-    }
-
-    @EventHandler
-    public void onHopperPickup(EntityPickupItemEvent event) {
-        if (event.getEntity() instanceof HopperMinecart || event.getEntity() instanceof Hopper) {
-            Item item = event.getItem();
-            for (DeathInfo deathInfo : deathRecords.values()) {
-                if (deathInfo.droppedItems.contains(item)) {
-                    event.setCancelled(true);
-                    return;
                 }
             }
         }

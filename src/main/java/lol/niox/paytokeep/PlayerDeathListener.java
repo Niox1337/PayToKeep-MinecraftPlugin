@@ -1,9 +1,7 @@
 package lol.niox.paytokeep;
 
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -118,19 +116,11 @@ public class PlayerDeathListener implements Listener {
     public void onPickupItem(EntityPickupItemEvent event) {
         Item item = event.getItem();
         Entity entity = event.getEntity();
-        Iterator<Map.Entry<UUID, DeathInfo>> iterator = deathRecords.entrySet().iterator();
         for (Map.Entry<UUID, DeathInfo> entry : deathRecords.entrySet()) {
             DeathInfo deathInfo = entry.getValue();
             if (deathInfo.droppedItems.contains(item)) {
-                event.setCancelled(true);
-                if (entity instanceof Player) {
-                    Player player = (Player) entity;
-                    if (player.getUniqueId().equals(entry.getKey())){
-                        event.setCancelled(false);
-                        return;
-                    }
-                    player.sendMessage(ChatColor.RED + "你不能拾取这个物品");
-                }
+                deathInfo.droppedItems.remove(item);
+                return;
             }
         }
     }

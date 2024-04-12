@@ -40,6 +40,7 @@ public class PlayerDeathListener implements Listener {
                 }
                 player.sendMessage(ChatColor.RED + "输入/salvagepart来恢复剩余物品");
                 deathInfo.attemptedSalvage = true;
+                deathInfo.lastDeath = currentTime;
                 return;
             }
             playerInventory.setContents(deathInfo.drops);

@@ -1,7 +1,6 @@
 package lol.niox.paytokeep;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 

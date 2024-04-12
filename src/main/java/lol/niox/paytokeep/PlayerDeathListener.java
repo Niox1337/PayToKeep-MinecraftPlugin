@@ -7,7 +7,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.*;
@@ -66,7 +65,7 @@ public class PlayerDeathListener implements Listener {
                 return;
             }
             List<Entity> entities = Objects.requireNonNull(deathInfo.location.getWorld())
-                    .getNearbyEntities(deathInfo.location, 2, 300, 2)
+                    .getNearbyEntities(deathInfo.location, 5, 100, 5)
                     .stream()
                     .filter(entity -> entity instanceof Item)
                     .collect(Collectors.toList());

@@ -6,24 +6,45 @@ commands:
   kpbuy:
     description: 购买保留物品
     usage: /<command>
+    permission: paytokeep.kpbuy
   kpsetprice:
     description: 设置保留物品价格
     usage: /<command> <price>
+    permission: paytokeep.kpsetprice
   kpswitch:
     description: 开关保留物品
     usage: /<command>
+    permission: paytokeep.kpbuy
   kpstatus:
     description: 查看保留物品状态
     usage: /<command>
+    permission: paytokeep.kpbuy
   salvage:
     description: 恢复物品
     usage: /<command>
+    permission: paytokeep.salvage
   salvagesetprice:
     description: 设置恢复物品价格
     usage: /<command> <price>
+    permission: paytokeep.salvagesetprice
   salvagesetexpire:
     description: 设置恢复物品过期时间
     usage: /<command> <time>
+    permission: paytokeep.salvagesetprice
   salvagepart:
     description: 部分恢复物品
     usage: /<command>
+    permission: paytokeep.salvage
+permissions:
+  paytokeep.kpbuy:
+    description: 购买保留物品
+    default: true
+  paytokeep.kpsetprice:
+    description: 设置保留物品价格
+    default: op
+  paytokeep.salvage:
+    description: 恢复物品
+    default: true
+  paytokeep.salvagesetprice:
+    description: 设置恢复物品价格和过期时间
+    default: op

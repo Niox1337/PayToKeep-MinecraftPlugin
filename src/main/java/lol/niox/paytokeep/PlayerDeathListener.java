@@ -69,7 +69,12 @@ public class PlayerDeathListener implements Listener {
                 return;
             }
             for (Item item : deathInfo.droppedItems){
-                playerInventory.addItem(item.getItemStack());
+                if (playerInventory.firstEmpty() != -1) {
+                    playerInventory.addItem(item.getItemStack());
+                } else {
+                    player.getWorld().dropItemNaturally(player.getLocation(), item.getItemStack());
+                    player.sendMessage(ChatColor.RED + "库存空间不足，部分物品已掉落");
+                }
             }
             deathInfo.clearDrops();
             player.setExp(deathInfo.exp);
@@ -128,7 +133,6 @@ public class PlayerDeathListener implements Listener {
     @EventHandler
     public void onPickupItem(EntityPickupItemEvent event) {
         Item item = event.getItem();
-        Entity entity = event.getEntity();
         for (Map.Entry<UUID, DeathInfo> entry : deathRecords.entrySet()) {
             DeathInfo deathInfo = entry.getValue();
             if (deathInfo.droppedItemContains(item)) {

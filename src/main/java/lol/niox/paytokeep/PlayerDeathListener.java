@@ -36,7 +36,7 @@ public class PlayerDeathListener implements Listener {
                 deathRecords.remove(player.getUniqueId());
                 return;
             }
-            if (!deathInfo.lostItems.isEmpty()) {
+            if (!deathInfo.lostItems.isEmpty() && player.hasPermission("paytokeep.salvagepart")) {
                 player.sendMessage(ChatColor.RED + "库存不完整，以下物品已丢失:");
                 for (Item item : deathInfo.lostItems) {
                     player.sendMessage(Objects.requireNonNull(item.getItemStack().getItemMeta()).getDisplayName() +
@@ -45,6 +45,16 @@ public class PlayerDeathListener implements Listener {
                 player.sendMessage(ChatColor.RED + "输入/salvagepart来恢复剩余物品");
                 deathInfo.setAttemptedSalvage(true);
                 deathInfo.setLastDeath(System.currentTimeMillis());
+                return;
+            }
+            if (!deathInfo.lostItems.isEmpty() && !player.hasPermission("paytokeep.salvagepart")) {
+                player.sendMessage(ChatColor.RED + "库存不完整，以下物品已丢失:");
+                for (Item item : deathInfo.lostItems) {
+                    player.sendMessage(Objects.requireNonNull(item.getItemStack().getItemMeta()).getDisplayName() +
+                            " x" + item.getItemStack().getAmount());
+                }
+                player.sendMessage(ChatColor.RED + "无法恢复物品");
+                deathRecords.remove(playerUUID);
                 return;
             }
             playerInventory.setContents(deathInfo.drops);
@@ -101,26 +111,30 @@ public class PlayerDeathListener implements Listener {
         String playerID = event.getEntity().getUniqueId().toString();
         Player player = event.getEntity();
         List<ItemStack> drops = new ArrayList<>(event.getDrops());
-        event.getDrops().clear();
         if (data.containsKey(playerID)) {
             if (data.get(playerID).get(0) && data.get(playerID).get(1)) {
+                event.getDrops().clear();
                 event.setKeepInventory(true);
                 event.setKeepLevel(true);
                 return;
             }
         }
-        event.getEntity().sendMessage(String.format("库存丢失，你有%s秒时间来购买库存恢复", PayToKeep.getSalvageExpirationTime() / 1000));
-        PlayerInventory playerInventory = player.getInventory();
 
-        DeathInfo deathInfo = new DeathInfo(System.currentTimeMillis(),
-                playerInventory.getContents(),
-                player.getExp(),
-                player.getLevel(),
-                player.getLocation(),
-                drops
-        );
-        deathRecords.put(event.getEntity().getUniqueId(), deathInfo);
-        deathInfo.dropItems();
+        if (player.hasPermission("paytokeep.salvage")) {
+            event.getDrops().clear();
+            PlayerInventory playerInventory = player.getInventory();
+
+            DeathInfo deathInfo = new DeathInfo(System.currentTimeMillis(),
+                    playerInventory.getContents(),
+                    player.getExp(),
+                    player.getLevel(),
+                    player.getLocation(),
+                    drops
+            );
+            deathInfo.dropItems();
+            player.sendMessage(String.format("库存丢失，你有%s秒时间来购买库存恢复", PayToKeep.getSalvageExpirationTime() / 1000));
+            deathRecords.put(event.getEntity().getUniqueId(), deathInfo);
+        }
 
     }
 

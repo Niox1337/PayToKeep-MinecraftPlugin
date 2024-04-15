@@ -181,8 +181,9 @@ public final class PayToKeep extends JavaPlugin {
             }
         }
 
+
         // /salvage
-        if (command.getName().equalsIgnoreCase("salvage")) {
+        if (command.getName().equalsIgnoreCase("salvage") && sender.hasPermission("paytokeep.salvage")) {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 if (econ.getBalance(player) < salvagePrice) {
@@ -197,7 +198,7 @@ public final class PayToKeep extends JavaPlugin {
         }
 
         // /setsalvageprice
-        if (command.getName().equalsIgnoreCase("salvagesetprice")) {
+        if (command.getName().equalsIgnoreCase("salvagesetprice") && sender.hasPermission("paytokeep.salvagesetprice")) {
             if (args.length > 0) {
                 try {
                     salvagePrice = Double.parseDouble(args[0]);
@@ -213,7 +214,7 @@ public final class PayToKeep extends JavaPlugin {
         }
 
         // /setexpire
-        if (command.getName().equalsIgnoreCase("salvagesetexpire")) {
+        if (command.getName().equalsIgnoreCase("salvagesetexpire") && sender.hasPermission("paytokeep.salvagesetexpire")) {
             if (args.length > 0) {
                 try {
                     salvageExpirationTime = Integer.parseInt(args[0]);
@@ -229,7 +230,7 @@ public final class PayToKeep extends JavaPlugin {
         }
 
         // /salvagepart
-        if (command.getName().equalsIgnoreCase("salvagepart")) {
+        if (command.getName().equalsIgnoreCase("salvagepart") && sender.hasPermission("paytokeep.salvagepart")) {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 if (econ.getBalance(player) < salvagePrice) {

@@ -15,25 +15,53 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static lol.niox.paytokeep.PlayerDeathListener.Salvage;
 import static lol.niox.paytokeep.PlayerDeathListener.salvagePart;
 
 public final class PayToKeep extends JavaPlugin {
+    public static final String FILE_PATH = "./plugins/PayToKeepData/data.json";
+    public static Map<String, List<Boolean>> data;  // <playerUUID, [hasBought, setToKeep]>
     private static Economy econ = null;
     private static Permission perms = null;
     private static Chat chat = null;
-    public static Map<String, List<Boolean>> data;  // <playerUUID, [hasBought, setToKeep]>
     private static double price;
     private static double salvagePrice;
     private static int salvageExpirationTime;
-    public static final String FILE_PATH = "./plugins/PayToKeepData/data.json";
+
+    public static void saveJsonData(String filePath) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Path path = Paths.get(filePath);
+        Map<String, Object> dataToWrite = new HashMap<>();
+        dataToWrite.put("data", data);
+        dataToWrite.put("price", price);
+        dataToWrite.put("salvagePrice", salvagePrice);
+        dataToWrite.put("salvageExpirationTime", salvageExpirationTime);
+
+        // Write the data to the file
+        try {
+            objectMapper.writeValue(path.toFile(), dataToWrite);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Map<String, List<Boolean>> getData() {
+        return data;
+    }
+
+    public static double getSalvageExpirationTime() {
+        return salvageExpirationTime;
+    }
 
     @Override
     public void onEnable() {
         System.out.println("autumnal—leaves是大笨蛋！");
-        if (!setupEconomy() ) {
+        if (!setupEconomy()) {
             getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
             getServer().getPluginManager().disablePlugin(this);
             return;
@@ -259,31 +287,6 @@ public final class PayToKeep extends JavaPlugin {
             salvagePrice = (double) loadedJson.get("salvagePrice");
             salvageExpirationTime = (int) loadedJson.get("salvageExpirationTime");
         }
-    }
-
-    public static void saveJsonData(String filePath) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Path path = Paths.get(filePath);
-        Map<String, Object> dataToWrite = new HashMap<>();
-        dataToWrite.put("data", data);
-        dataToWrite.put("price", price);
-        dataToWrite.put("salvagePrice", salvagePrice);
-        dataToWrite.put("salvageExpirationTime", salvageExpirationTime);
-
-        // Write the data to the file
-        try {
-            objectMapper.writeValue(path.toFile(), dataToWrite);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static Map<String, List<Boolean>> getData() {
-        return data;
-    }
-
-    public static double getSalvageExpirationTime() {
-        return salvageExpirationTime;
     }
 
 }

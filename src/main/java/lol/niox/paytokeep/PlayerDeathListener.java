@@ -1,7 +1,8 @@
 package lol.niox.paytokeep;
 
 import org.bukkit.ChatColor;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -28,7 +29,7 @@ public class PlayerDeathListener implements Listener {
                 player.sendMessage(ChatColor.RED + "你的库存已过期");
                 return;
             }
-            if (deathInfo.droppedItems.isEmpty()){
+            if (deathInfo.droppedItems.isEmpty()) {
                 player.sendMessage(ChatColor.RED + "可恢复库存为空！");
                 deathRecords.remove(player.getUniqueId());
                 return;
@@ -69,7 +70,7 @@ public class PlayerDeathListener implements Listener {
                 player.sendMessage(ChatColor.RED + "你的库存已过期");
                 return;
             }
-            for (Item item : deathInfo.droppedItems){
+            for (Item item : deathInfo.droppedItems) {
                 if (playerInventory.firstEmpty() != -1) {
                     playerInventory.addItem(item.getItemStack());
                 } else {
@@ -113,7 +114,6 @@ public class PlayerDeathListener implements Listener {
         );
         deathRecords.put(event.getEntity().getUniqueId(), deathInfo);
         deathInfo.dropItems();
-
 
     }
 

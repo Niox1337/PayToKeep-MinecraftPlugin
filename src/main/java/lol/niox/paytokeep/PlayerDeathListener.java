@@ -30,6 +30,7 @@ public class PlayerDeathListener implements Listener {
             }
             if (deathInfo.droppedItems.isEmpty()){
                 player.sendMessage(ChatColor.RED + "可恢复库存为空！");
+                deathRecords.remove(player.getUniqueId());
                 return;
             }
             if (!deathInfo.lostItems.isEmpty()) {
@@ -39,8 +40,8 @@ public class PlayerDeathListener implements Listener {
                             " x" + item.getItemStack().getAmount());
                 }
                 player.sendMessage(ChatColor.RED + "输入/salvagepart来恢复剩余物品");
-                deathInfo.attemptedSalvage = true;
-                deathInfo.lastDeath = currentTime;
+                deathInfo.setAttemptedSalvage(true);
+                deathInfo.setLastDeath(System.currentTimeMillis());
                 return;
             }
             playerInventory.setContents(deathInfo.drops);

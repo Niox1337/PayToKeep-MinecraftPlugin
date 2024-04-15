@@ -51,4 +51,12 @@ public class DeathInfo {
     public boolean droppedItemContains(Item item) {
         return droppedItems.contains(item);
     }
+
+    public void setAttemptedSalvage(boolean attemptedSalvage) {
+        this.attemptedSalvage = attemptedSalvage;
+    }
+
+    public void setLastDeath(long lastDeath) {
+        this.lastDeath = lastDeath;
+    }
 }

@@ -28,7 +28,7 @@ public class PlayerDeathListener implements Listener {
                 player.sendMessage(ChatColor.RED + "你的库存已过期");
                 return;
             }
-            if (!deathInfo.droppedItems.isEmpty()){
+            if (deathInfo.droppedItems.isEmpty()){
                 player.sendMessage(ChatColor.RED + "可恢复库存为空！");
                 return;
             }
@@ -73,7 +73,7 @@ public class PlayerDeathListener implements Listener {
                     playerInventory.addItem(item.getItemStack());
                 } else {
                     player.getWorld().dropItemNaturally(player.getLocation(), item.getItemStack());
-                    player.sendMessage(ChatColor.RED + "库存空间不足，部分物品已掉落");
+                    player.sendMessage(ChatColor.RED + "库存空间不足" + Objects.requireNonNull(item.getItemStack().getItemMeta()).getDisplayName() + "已掉落");
                 }
             }
             deathInfo.clearDrops();

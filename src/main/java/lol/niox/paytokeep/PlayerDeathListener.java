@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -24,8 +25,8 @@ public class PlayerDeathListener implements Listener {
     public static void Salvage(Player player, long currentTime) {
         UUID playerUUID = player.getUniqueId();
         if (deathRecords.containsKey(playerUUID)) {
-            DeathInfo deathInfo = deathRecords.get(playerUUID);
             PlayerInventory playerInventory = player.getInventory();
+            DeathInfo deathInfo = deathRecords.get(playerUUID);
             if (currentTime - deathInfo.lastDeath > PayToKeep.getSalvageExpirationTime()) {
                 deathRecords.remove(player.getUniqueId());
                 player.sendMessage(ChatColor.RED + "你的库存已过期");
@@ -39,8 +40,13 @@ public class PlayerDeathListener implements Listener {
             if (!deathInfo.lostItems.isEmpty() && player.hasPermission("paytokeep.salvagepart")) {
                 player.sendMessage(ChatColor.RED + "库存不完整，以下物品已丢失:");
                 for (Item item : deathInfo.lostItems) {
-                    player.sendMessage(Objects.requireNonNull(item.getItemStack().getItemMeta()).getDisplayName() +
-                            " x" + item.getItemStack().getAmount());
+                    player.sendMessage(ChatColor.GRAY + item.getName() +
+                            " x" + ChatColor.RESET + item.getItemStack().getAmount());
+                }
+                player.sendMessage(ChatColor.GREEN + "以下物品可恢复:");
+                for (Item item : deathInfo.droppedItems) {
+                    player.sendMessage(ChatColor.AQUA + item.getName() +
+                            " x" + ChatColor.RESET + item.getItemStack().getAmount());
                 }
                 player.sendMessage(ChatColor.RED + "输入/salvagepart来恢复剩余物品");
                 deathInfo.setAttemptedSalvage(true);
@@ -48,11 +54,6 @@ public class PlayerDeathListener implements Listener {
                 return;
             }
             if (!deathInfo.lostItems.isEmpty() && !player.hasPermission("paytokeep.salvagepart")) {
-                player.sendMessage(ChatColor.RED + "库存不完整，以下物品已丢失:");
-                for (Item item : deathInfo.lostItems) {
-                    player.sendMessage(Objects.requireNonNull(item.getItemStack().getItemMeta()).getDisplayName() +
-                            " x" + item.getItemStack().getAmount());
-                }
                 player.sendMessage(ChatColor.RED + "无法恢复物品");
                 deathRecords.remove(playerUUID);
                 return;
@@ -92,7 +93,7 @@ public class PlayerDeathListener implements Listener {
                     playerInventory.addItem(item.getItemStack());
                 } else {
                     player.getWorld().dropItemNaturally(player.getLocation(), item.getItemStack());
-                    player.sendMessage(ChatColor.RED + "库存空间不足" + Objects.requireNonNull(item.getItemStack().getItemMeta()).getDisplayName() + "已掉落");
+                    player.sendMessage(ChatColor.RED + "库存空间不足 " + item + " 已掉落");
                 }
             }
             deathInfo.clearDrops();
@@ -158,10 +159,19 @@ public class PlayerDeathListener implements Listener {
         for (Map.Entry<UUID, DeathInfo> entry : deathRecords.entrySet()) {
             DeathInfo deathInfo = entry.getValue();
             if (deathInfo.droppedItemContains(item)) {
-                if (event.getEntity() instanceof Hopper || event.getEntity() instanceof HopperMinecart) {
-                    event.setCancelled(true);
-                    return;
-                }
+                deathInfo.removeDroppedItem(item);
+                deathInfo.addLostItem(item);
+                return;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInventoryPickupItem(InventoryPickupItemEvent event) {
+        Item item = event.getItem();
+        for (Map.Entry<UUID, DeathInfo> entry : deathRecords.entrySet()) {
+            DeathInfo deathInfo = entry.getValue();
+            if (deathInfo.droppedItemContains(item)) {
                 deathInfo.removeDroppedItem(item);
                 deathInfo.addLostItem(item);
                 return;
